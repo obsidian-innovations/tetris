@@ -8,5 +8,8 @@
   :plugins [[lein-auto "0.1.1"]]
   :main ^:skip-aot tetris.core
   :target-path "target/%s"
-  :profiles {:uberjar {:aot :all}
-             :dev {:dependencies [[org.clojure/tools.namespace "0.2.9"]]}})
+  :repl-options {
+                  :init-ns tetris.dev}
+  :profiles {
+              :uberjar {:aot :all}
+              :dev {:dependencies [[org.clojure/tools.namespace "0.2.9"]]}})

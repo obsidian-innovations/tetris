@@ -1,11 +1,9 @@
 (ns tetris.core
-  (require [clojure.tools.namespace.repl :refer [refresh]])
-  (use [clojure.test] [clojure.set] [clojure.walk])
+  (:require
+    [clojure.set :refer :all]
+    [clojure.walk :refer :all])
   (:gen-class))
 
-
-(def o-like
-    #{{:x 0 :y 0} {:x 1 :y 0} {:x 0 :y 1} {:x 1 :y 1}})
 
 (defn move-to-xy [x y obj]
   (set
@@ -62,12 +60,6 @@
     obj
     (take 1 (empty-line-ys bottom-y top-y obj))))
 
-
-(deftest testing-line-mask
-  (is (= #{{:x 0 :y 5} {:x 1 :y 5} {:x 2 :y 5}} (line-mask 0 2 5))))
-
-(deftest moving-objects
-  (is (= #{{:x 10 :y 10} {:x 11 :y 10} {:x 10 :y 11} {:x 11 :y 11}} (move-to-xy 10 10 o-like))))
 
 (defn -main
   "I don't do a whole lot ... yet."
