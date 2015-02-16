@@ -13,4 +13,12 @@
             :tetromino tetromino
             :heap #{}})
 
+(defn update-positions-in [s positions]
+  (update-in s [:tetromino :positions] positions))
+
+(defn shift-positions-right [s]
+  (update-in s [:tetromino :positions] #(into (vector (last %)) (pop %))))
+
+(defn shift-positions-left [s]
+  (update-in s [:tetromino :positions] #(conj (subvec % 1) (first %))))
 
