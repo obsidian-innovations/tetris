@@ -21,3 +21,7 @@ Running Clojure tests
     $ user=> (run-tests)
 
 
+## Terminal UI: clojure-lanterna
+
+http://sjl.bitbucket.org/clojure-lanterna/
+
