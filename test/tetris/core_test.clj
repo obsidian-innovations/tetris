@@ -1,6 +1,6 @@
 (ns tetris.core-test
   (:require [clojure.test :refer :all]
-            [tetris.objects :refer :all]
+            [tetris.tetromino :refer :all]
             [tetris.core :refer :all]))
 
 (deftest a-test
