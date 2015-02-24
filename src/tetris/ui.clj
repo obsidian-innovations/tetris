@@ -1,12 +1,14 @@
 (ns tetris.ui
-  (:require [lanterna.screen :as term :refer :all]))
+  (:require
+    [tetris.board :as board]
+    [lanterna.screen :as term :refer :all]))
 
 (defn draw-board []
-  (let [s (term/get-screen)]
+  (let [s (term/get-screen)
+        b (board/state)]
     (term/start s)
-    (term/put-string s 10 10 "Hello, world!")
+    (doall (map #(term/put-string s (:x %) (:y %) "@") (get-in b [:boundaries :wall-bricks])))
     (term/redraw s)
     (term/get-key-blocking s)
     (term/stop s)
-    
     ))

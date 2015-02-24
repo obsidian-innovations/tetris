@@ -1,9 +1,9 @@
 (ns tetris.board)
 
 (def boundaries {:bottom-y 0
-                 :top-y 0
+                 :top-y 15
                  :left-x 0
-                 :right-x 0
+                 :right-x 20
                  :wall-bricks #{}})
 
 (def tetromino {:x 0
@@ -26,6 +26,6 @@
       {:x x :y y})))
 
 (defn state []
-  {:boundaries (update-in boundaries [:wall-bricks] #(init-bricks boundaries))
+  {:boundaries (update-in boundaries [:wall-bricks] (fn [x] (init-bricks boundaries)))
    :tetromino tetromino
    :heap #{}})
