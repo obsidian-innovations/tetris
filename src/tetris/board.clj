@@ -10,10 +10,6 @@
                 :y 0
                 :positions []})
 
-(defn state {:boundaries boundaries
-             :tetromino tetromino
-             :heap #{}})
-
 (defn update-positions-in [s positions]
   (update-in s [:tetromino :positions] positions))
 
@@ -24,4 +20,12 @@
   (update-in s [:tetromino :positions] #(conj (subvec % 1) (first %))))
 
 (defn init-bricks [b]
-  )
+  (set
+    (for [x (range (b :left-x) (inc (b :right-x)))
+          y (range (b :bottom-y) (inc (b :top-y)))]
+      {:x x :y y})))
+
+(defn state []
+  {:boundaries (update-in boundaries [:wall-bricks] #(init-bricks boundaries))
+   :tetromino tetromino
+   :heap #{}})
