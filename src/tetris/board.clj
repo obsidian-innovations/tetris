@@ -20,10 +20,12 @@
   (update-in s [:tetromino :positions] #(conj (subvec % 1) (first %))))
 
 (defn init-bricks [b]
-  (set
+  (->>
     (for [x (range (b :left-x) (inc (b :right-x)))
           y (range (b :bottom-y) (inc (b :top-y)))]
-      {:x x :y y})))
+      {:x x :y y})
+    (filter #(or (= (% :x) (b :left-x)) (= (% :x) (b :right-x)) (= (% :y) (b :bottom-y))))
+    (set)))
 
 (defn state []
   {:boundaries (update-in boundaries [:wall-bricks] (fn [x] (init-bricks boundaries)))

@@ -7,7 +7,7 @@
   (let [s (term/get-screen)
         b (board/state)]
     (term/start s)
-    (doall (map #(term/put-string s (:x %) (:y %) "@") (get-in b [:boundaries :wall-bricks])))
+    (doall (map #(term/put-string s (:x %) (- (:top-y (:boundaries b)) (:y %)) "@") (get-in b [:boundaries :wall-bricks])))
     (term/redraw s)
     (term/get-key-blocking s)
     (term/stop s)
