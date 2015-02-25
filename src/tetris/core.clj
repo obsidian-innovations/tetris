@@ -21,8 +21,8 @@
 (defn collision-detected? [obj world]
   (not (empty? (intersection obj world))))
 
-(defn merge-objects [obj-a obj-b]
-  (union obj-a obj-b) )
+(defn merge-objects [& objs]
+  (union objs))
 
 (defn line-mask [left-x right-x y]
   (set 

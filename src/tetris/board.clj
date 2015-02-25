@@ -1,4 +1,5 @@
-(ns tetris.board)
+(ns tetris.board
+  (:require [tetris.tetromino :as t]))
 
 (def boundaries {:bottom-y 0
                  :top-y 15
@@ -6,9 +7,8 @@
                  :right-x 20
                  :wall-bricks #{}})
 
-(def tetromino {:x 0
-                :y 0
-                :positions []})
+(def tetromino {:coords {:x 10 :y 15}
+                :positions t/t-like})
 
 (defn update-positions-in [s positions]
   (update-in s [:tetromino :positions] positions))
