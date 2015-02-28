@@ -38,32 +38,30 @@
     )
   )
 
-(defn board-timer [count screen board]
+(defn board-timer [screen board]
   
   (chime-at [(-> 1 t/secs t/from-now)]
     (fn [time]
-      ;(println "hello")
-      (if (> count 0)
+      (let [k (term/get-key screen)]
+        (if (not= k :escape)
 
-        (do-draw screen board #(board-timer (dec count) screen %))
+          (do-draw screen board #(board-timer screen %))
 
-        (do
-          (println "done...")
-          (term/get-key-blocking screen)
-          (term/stop screen))
+          (do
+            (term/stop screen))
+          )
         )
-      
       ))
   
   )
 
-(defn draw-board [count]
+(defn draw-board []
 
   (let [b (board/state)
         s (term/get-screen)]
     (term/start s)
 
-    (board-timer count s b)
+    (board-timer s b)
     
     
     ))
