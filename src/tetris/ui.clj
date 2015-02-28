@@ -26,10 +26,9 @@
       state
       next-state)))
 
-(defn do-draw [screen b on-done-fn]
+(defn do-draw [screen b-updated on-done-fn]
 
-  (let [b-updated (move-when-no-collision b move-down)
-        tetro (:tetromino b-updated)
+  (let [tetro (:tetromino b-updated)
         tetro-bricks (core/move-to-xy (:x (:coords tetro)) (:y (:coords tetro)) (first (:positions tetro)))
         world (clojure.set/union (:heap b-updated) (:wall-bricks (:boundaries b-updated)))
         all (clojure.set/union tetro-bricks world)
@@ -50,20 +49,17 @@
   )
 
 (defn board-timer [screen board]
-  
   (chime-at [(-> 1 t/secs t/from-now)]
     (fn [time]
       (let [k (term/get-key screen)]
-        (if (not= k :escape)
-
-          (do-draw screen board #(board-timer screen %))
-
-          (do
-            (term/stop screen))
-          )
-        )
+        (cond 
+          (= k :escape) (term/stop screen)
+          (= k :left) (do-draw screen (move-when-no-collision board move-left) #(board-timer screen %))
+          (= k :right) (do-draw screen (move-when-no-collision board move-right) #(board-timer screen %))
+          (= k :down) (do-draw screen (move-when-no-collision board move-down) #(board-timer screen %))
+          :else (do-draw screen (move-when-no-collision board move-down) #(board-timer screen %))
+        ))
       ))
-  
   )
 
 (defn draw-board []
