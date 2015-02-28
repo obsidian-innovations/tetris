@@ -6,18 +6,29 @@
     [tetris.core :as core]
     [lanterna.screen :as term :refer :all]))
 
+(defn move-down [state]
+  (update-in state [:tetromino :coords :y] dec))
+
+(defn move-right [state]
+  (update-in state [:tetromino :coords :x] inc))
+
+(defn move-left [state]
+  (update-in state [:tetromino :coords :x] dec))
+
+(defn move-when-no-collision [state action]
+  (let [next-state (action state)]
+    (if (core/collision-detected?
+          (core/move-to-xy
+            (:x (:coords (:tetromino next-state)))
+            (:y (:coords (:tetromino next-state)))
+            (first (:positions (:tetromino next-state))))
+          (clojure.set/union (:heap next-state) (:wall-bricks (:boundaries next-state))))
+      state
+      next-state)))
+
 (defn do-draw [screen b on-done-fn]
 
-  (let [b-next (update-in b [:tetromino :coords :y] dec)
-        b-updated (if (core/collision-detected? 
-                        (core/move-to-xy 
-                          (:x (:coords (:tetromino b-next))) 
-                          (:y (:coords (:tetromino b-next))) 
-                          (first (:positions (:tetromino b-next))))
-                        (clojure.set/union (:heap b-next) (:wall-bricks (:boundaries b-next))))
-                    b 
-                    b-next)
-
+  (let [b-updated (move-when-no-collision b move-down)
         tetro (:tetromino b-updated)
         tetro-bricks (core/move-to-xy (:x (:coords tetro)) (:y (:coords tetro)) (first (:positions tetro)))
         world (clojure.set/union (:heap b-updated) (:wall-bricks (:boundaries b-updated)))
