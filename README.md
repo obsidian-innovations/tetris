@@ -1,4 +1,8 @@
 
+# About
+
+Clojure-based core library for the game of TETRIS.
+
 # Dependencies
 
 ## Refreshing: clojure.tools.namespace
@@ -24,4 +28,3 @@ Running Clojure tests
 ## Terminal UI: clojure-lanterna
 
 http://sjl.bitbucket.org/clojure-lanterna/
-
