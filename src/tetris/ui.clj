@@ -41,40 +41,53 @@
         #(term/put-string s (:x %) (- (:top-y (:boundaries b-updated)) (:y %)) "@")
         all))
 
-    
     (term/redraw s)
     
     (on-done-fn b-updated)
-    )
-  )
+    ))
 
-(defn board-timer [screen board]
-  (chime-at [(-> 1 t/secs t/from-now)]
+(def event-handlers
+  {:user-action
+   (fn [screen board events on-draw-done-fn]
+     (let [k (term/get-key screen)]
+       (cond
+         (= k :escape) (term/stop screen)
+         (= k :left) (do-draw screen (move-when-no-collision board move-left) #(on-draw-done-fn screen % events))
+         (= k :right) (do-draw screen (move-when-no-collision board move-right) #(on-draw-done-fn screen % events))
+         (= k :down) (do-draw screen (move-when-no-collision board move-down) #(on-draw-done-fn screen % events))
+         :else (on-draw-done-fn screen board events)
+         ;:else (do-draw screen (move-when-no-collision board move-down) #(board-timer screen %))
+         )))
+   :gravity-action
+     (fn [screen board events on-draw-done-fn]
+       (do-draw
+         screen
+         (move-when-no-collision board move-down)
+         #(on-draw-done-fn screen % events)))
+   })
+
+(defn board-timer [screen board events]
+  (chime-at [(-> 50 t/millis t/from-now)]
     (fn [time]
-      (let [k (term/get-key screen)]
-        (cond 
-          (= k :escape) (term/stop screen)
-          (= k :left) (do-draw screen (move-when-no-collision board move-left) #(board-timer screen %))
-          (= k :right) (do-draw screen (move-when-no-collision board move-right) #(board-timer screen %))
-          (= k :down) (do-draw screen (move-when-no-collision board move-down) #(board-timer screen %))
-          :else (do-draw screen (move-when-no-collision board move-down) #(board-timer screen %))
-        ))
+      (println "# " (first events))
+      (((first events) event-handlers) screen board (rest events) board-timer)
       ))
   )
 
 (defn event-codes []
-  (let [user-action (repeat 9 :user-action)
+  (let [user-action (repeat 20 :user-action)
         gravity-action [:gravity-action]
-        init-codes (flatten (interleave gravity-action (seq user-action)))]
+        init-codes (flatten (interleave gravity-action (vector user-action)))]
     (cycle init-codes)))
 
 (defn draw-board []
 
-  (let [b (board/state)
-        s (term/get-screen)]
-    (term/start s)
+  (let [board (board/state)
+        events (event-codes)
+        screen (term/get-screen)]
+    (term/start screen)
 
-    (board-timer s b)
+    (board-timer screen board events)
     
     
     ))
