@@ -21,13 +21,16 @@
 (defn rotate-right [state]
   (update-in state [:tetromino :current :positions] rest))
 
+(defn move-to-coords [state]
+  (core/move-to-xy
+    (:x (:coords (:current (:tetromino state))))
+    (:y (:coords (:current (:tetromino state))))
+    (first (:positions (:current (:tetromino state))))))
+
 (defn move-when-no-collision [state action]
   (let [next-state (action state)]
     (if (core/collision-detected?
-          (core/move-to-xy
-            (:x (:coords (:current (:tetromino next-state))))
-            (:y (:coords (:current (:tetromino next-state))))
-            (first (:positions (:current (:tetromino next-state)))))
+          (move-to-coords next-state)
           (clojure.set/union (:heap next-state) (:wall-bricks (:boundaries next-state))))
       state
       next-state)))
@@ -53,7 +56,10 @@
     ))
 
 (defn put-next-tetromino [state]
-  (update-in state [:tetromino] #(hash-map :current (first (:next %)) :next (rest (:next %)))))
+  (->
+    state
+    (update-in [:heap] #(clojure.set/union % (move-to-coords state)))
+    (update-in [:tetromino] #(hash-map :current (first (:next %)) :next (rest (:next %))))))
 
 (def event-handlers
   {:user-action
