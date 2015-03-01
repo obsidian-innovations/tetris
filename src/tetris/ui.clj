@@ -69,7 +69,6 @@
 (defn board-timer [screen board events]
   (chime-at [(-> 50 t/millis t/from-now)]
     (fn [time]
-      (println "# " (first events))
       (((first events) event-handlers) screen board (rest events) board-timer)
       ))
   )
