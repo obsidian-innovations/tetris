@@ -62,6 +62,12 @@
       ))
   )
 
+(defn event-codes []
+  (let [user-action (repeat 9 :user-action)
+        gravity-action [:gravity-action]
+        init-codes (flatten (interleave gravity-action (seq user-action)))]
+    (cycle init-codes)))
+
 (defn draw-board []
 
   (let [b (board/state)
