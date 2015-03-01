@@ -35,5 +35,5 @@
     [#{{:x 0 :y 0} {:x 0 :y 1} {:x -1 :y 1} {:x 1 :y 0}}
      #{{:x 0 :y 0} {:x 1 :y 0} {:x 1 :y 1} {:x 0 :y -1}}])
 
-(def all-objects 
+(def all
   [i-like j-like l-like o-like s-like t-like z-like])

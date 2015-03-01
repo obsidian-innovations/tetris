@@ -29,7 +29,12 @@
     (filter #(or (= (% :x) (b :left-x)) (= (% :x) (b :right-x)) (= (% :y) (b :bottom-y))))
     (set)))
 
+(defn init-tetromino []
+  (let [all (repeatedly #(tetromino (rand-nth tetris.tetromino/all)))]
+    {:current (first all)
+     :next (rest all)}))
+
 (defn state []
   {:boundaries (update-in boundaries [:wall-bricks] (fn [x] (init-bricks boundaries)))
-   :tetromino (tetromino t/l-like)
+   :tetromino (init-tetromino)
    :heap #{}})
