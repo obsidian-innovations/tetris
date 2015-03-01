@@ -7,10 +7,10 @@
                  :right-x 20
                  :wall-bricks #{}})
 
-(defn tetromino [ts]
+(defn tetromino [sprites]
   {:coords {:x 10 :y 15} 
-   :sprites ts
-   :positions (cycle ts)})
+   :sprites sprites
+   :positions (cycle sprites)})
 
 ;(defn update-positions-in [s positions]
 ;  (update-in s [:tetromino :positions] positions))
@@ -31,5 +31,5 @@
 
 (defn state []
   {:boundaries (update-in boundaries [:wall-bricks] (fn [x] (init-bricks boundaries)))
-   :tetromino (tetromino t/i-like)
+   :tetromino (tetromino t/t-like)
    :heap #{}})
