@@ -15,6 +15,12 @@
 (defn move-left [state]
   (update-in state [:tetromino :coords :x] dec))
 
+(defn rotate-left [state]
+  (update-in state [:tetromino :positions] #(drop (dec (count (get-in state [:tetromino :sprites]))) %)))
+
+(defn rotate-right [state]
+  (update-in state [:tetromino :positions] rest))
+
 (defn move-when-no-collision [state action]
   (let [next-state (action state)]
     (if (core/collision-detected?
@@ -54,7 +60,9 @@
          (= k :escape) (term/stop screen)
          (= k :left) (do-draw screen (move-when-no-collision board move-left) #(on-draw-done-fn screen % events))
          (= k :right) (do-draw screen (move-when-no-collision board move-right) #(on-draw-done-fn screen % events))
-         (= k :down) (do-draw screen (move-when-no-collision board move-down) #(on-draw-done-fn screen % events))
+         (= k :space) (do-draw screen (move-when-no-collision board move-down) #(on-draw-done-fn screen % events))
+         (= k :up) (do-draw screen (move-when-no-collision board rotate-left) #(on-draw-done-fn screen % events))
+         (= k :down) (do-draw screen (move-when-no-collision board rotate-right) #(on-draw-done-fn screen % events))
          :else (on-draw-done-fn screen board events)
          ;:else (do-draw screen (move-when-no-collision board move-down) #(board-timer screen %))
          )))
