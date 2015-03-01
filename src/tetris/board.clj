@@ -31,5 +31,5 @@
 
 (defn state []
   {:boundaries (update-in boundaries [:wall-bricks] (fn [x] (init-bricks boundaries)))
-   :tetromino (tetromino t/t-like)
+   :tetromino (tetromino t/z-like)
    :heap #{}})
