@@ -7,17 +7,19 @@
                  :right-x 20
                  :wall-bricks #{}})
 
-(def tetromino {:coords {:x 10 :y 15}
-                :positions t/t-like})
+(defn tetromino [sprites]
+  {:coords {:x 10 :y 15} 
+   :sprites sprites
+   :positions (cycle sprites)})
 
-(defn update-positions-in [s positions]
-  (update-in s [:tetromino :positions] positions))
+;(defn update-positions-in [s positions]
+;  (update-in s [:tetromino :positions] positions))
 
-(defn shift-positions-right [s]
-  (update-in s [:tetromino :positions] #(into (vector (last %)) (pop %))))
-
-(defn shift-positions-left [s]
-  (update-in s [:tetromino :positions] #(conj (subvec % 1) (first %))))
+;(defn shift-positions-right [s]
+;  (update-in s [:tetromino :positions] #(into (vector (last %)) (pop %))))
+;
+;(defn shift-positions-left [s]
+;  (update-in s [:tetromino :positions] #(conj (subvec % 1) (first %))))
 
 (defn init-bricks [b]
   (->>
@@ -27,7 +29,12 @@
     (filter #(or (= (% :x) (b :left-x)) (= (% :x) (b :right-x)) (= (% :y) (b :bottom-y))))
     (set)))
 
+(defn init-tetromino []
+  (let [all (repeatedly #(tetromino (rand-nth tetris.tetromino/all)))]
+    {:current (first all)
+     :next (rest all)}))
+
 (defn state []
   {:boundaries (update-in boundaries [:wall-bricks] (fn [x] (init-bricks boundaries)))
-   :tetromino tetromino
+   :tetromino (init-tetromino)
    :heap #{}})
