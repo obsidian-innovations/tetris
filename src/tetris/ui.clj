@@ -59,6 +59,7 @@
   (->
     state
     (update-in [:heap] #(clojure.set/union % (move-to-coords state)))
+    (update-in [:heap] #(core/remove-complete-lines 1 19 %))
     (update-in [:tetromino] #(hash-map :current (first (:next %)) :next (rest (:next %))))))
 
 (def event-handlers

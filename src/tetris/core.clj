@@ -36,11 +36,11 @@
 
 (defn obj-line-masks [left-x right-x obj]
   (map 
-    #(line-mask left-x right-x %) 
+    #(line-mask left-x right-x %)
     (range (obj-min-y obj) (inc (obj-max-y obj)))))
 
 (defn apply-line-masks [obj masks]
-  (apply difference obj (filter #(= (difference obj %) %) masks)))
+  (apply difference obj (filter #(= (intersection obj %) %) masks)))
 
 (defn remove-complete-lines [left-x right-x obj]
   (apply-line-masks obj (obj-line-masks left-x right-x obj)))
