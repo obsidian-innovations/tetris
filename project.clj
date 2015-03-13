@@ -7,7 +7,7 @@
                  [jarohen/chime "0.1.6"]
                  [clojure-lanterna "0.9.4"]]
   :plugins [[lein-auto "0.1.1"]]
-  :main ^:skip-aot tetris.core
+  :main ^:skip-aot tetris.ui
   :target-path "target/%s"
   :repl-options {
                   :init-ns tetris.dev}

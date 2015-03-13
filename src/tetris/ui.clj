@@ -113,3 +113,6 @@
     
     
     ))
+
+(defn -main [& args]
+  (draw-board))
