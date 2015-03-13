@@ -45,20 +45,17 @@
 (defn remove-complete-lines [left-x right-x obj]
   (apply-line-masks obj (obj-line-masks left-x right-x obj)))
 
-(defn empty-line-ys [bottom-y top-y obj]
-  (sort
-    (seq
-      (intersection
-        (set (range bottom-y (inc top-y)))
-        (walk :y set obj)))))
+(defn bottom-most-empty-y [bottom-y top-y obj]
+  (apply min (difference (set (range bottom-y (inc top-y))) (walk :y set obj))))
 
-(defn collapse-bottom-most-only [bottom-y top-y obj]
-  (reduce 
-    (fn [empty-y]
-      (let [falling (group-by #(> % empty-y))]
-        (merge-objects (move-one-down (true falling)) (false falling)))) 
+(defn collapse-on-y [y obj]
+  (let [falling-objs (group-by #(> (:y %) y) obj)]
+    (union (move-one-down (set (falling-objs true))) (set (falling-objs false)))))
+
+(defn collapse-bottom-most-empty [bottom-y top-y obj]
+  (if (empty? obj)
     obj
-    (take 1 (empty-line-ys bottom-y top-y obj))))
+    (collapse-on-y (bottom-most-empty-y bottom-y top-y obj) obj)))
 
 
 (defn -main
