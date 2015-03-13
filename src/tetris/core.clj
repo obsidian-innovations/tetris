@@ -57,6 +57,9 @@
     obj
     (collapse-on-y (bottom-most-empty-y bottom-y top-y obj) obj)))
 
+(defn collapse-all-empty [bottom-y top-y obj]
+  (let [obj-collapsed (collapse-bottom-most-empty bottom-y top-y obj)]
+    (if (= obj obj-collapsed) obj-collapsed (recur bottom-y top-y obj-collapsed))))
 
 (defn -main
   "I don't do a whole lot ... yet."

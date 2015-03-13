@@ -24,3 +24,10 @@
     (=
       #{{:x 0 :y 1} {:x 1 :y 1} {:x 2 :y 1} {:x 1 :y 0} {:x 1 :y 3}}
       (collapse-bottom-most-empty 0 10 #{{:x 0 :y 2} {:x 1 :y 2} {:x 2 :y 2} {:x 1 :y 0} {:x 1 :y 4}}))))
+
+(deftest collapse-all-empty-lines
+  (is
+    (=
+      #{{:x 0 :y 1} {:x 1 :y 1} {:x 2 :y 1} {:x 1 :y 0} {:x 1 :y 2}}
+      (collapse-all-empty 0 10 #{{:x 0 :y 2} {:x 1 :y 2} {:x 2 :y 2} {:x 1 :y 0} {:x 1 :y 4}}))))
+
