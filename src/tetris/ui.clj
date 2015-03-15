@@ -35,7 +35,7 @@
       state
       next-state)))
 
-(defn do-draw [screen b-updated on-done-fn]
+(defn do-draw [screen b-updated]
   (let [tetro (:current (:tetromino b-updated))
         tetro-bricks (core/move-to-xy (:x (:coords tetro)) (:y (:coords tetro)) (first (:positions tetro)))
         world (clojure.set/union (:heap b-updated) (:wall-bricks (:boundaries b-updated)))
@@ -46,7 +46,7 @@
         #(term/put-string screen (:x %) (- (:top-y (:boundaries b-updated)) (:y %)) "@")
         all))
     (term/redraw screen)
-    (on-done-fn b-updated)))
+    ))
 
 (defn put-next-tetromino [state]
   (->
@@ -61,25 +61,25 @@
    (fn [screen board events on-draw-done-fn]
      (let [k (term/get-key screen)
            updated-board (cond
-                           (= k :escape) (term/stop screen)
+                           (= k :escape) (do (term/stop screen) board)
                            (= k :left) (move-when-no-collision board move-left)
                            (= k :right) (move-when-no-collision board move-right)
                            (= k :enter) (move-when-no-collision board move-down)
                            (= k :up) (move-when-no-collision board rotate-left)
                            (= k :down) (move-when-no-collision board rotate-right)
                            :else board)]
-       (if (= updated-board board)
-         (on-draw-done-fn screen updated-board events)
-         (do-draw screen updated-board #(on-draw-done-fn screen % events)))
+       (when (not= updated-board board) (do-draw screen updated-board))
+       (on-draw-done-fn screen updated-board events)
        ))
    :gravity-action
      (fn [screen board events on-draw-done-fn]
        (let [updated-board (move-when-no-collision board move-down)
              updated-y (get-in updated-board [:tetromino :current :coords :y])
              current-y (get-in board [:tetromino :current :coords :y])]
+         (do-draw screen updated-board)
          (if (= current-y updated-y)
-           (do-draw screen updated-board (fn [n] (on-draw-done-fn screen (put-next-tetromino updated-board) events)))
-           (do-draw screen updated-board #(on-draw-done-fn screen % events)))
+           (on-draw-done-fn screen (put-next-tetromino updated-board) events)
+           (on-draw-done-fn screen updated-board events))
          ))})
 
 (defn board-timer [screen board events]
