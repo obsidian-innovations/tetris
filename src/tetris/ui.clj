@@ -45,8 +45,7 @@
       (map
         #(term/put-string screen (:x %) (- (:top-y (:boundaries b-updated)) (:y %)) "@")
         all))
-    (term/redraw screen)
-    ))
+    (term/redraw screen)))
 
 (defn put-next-tetromino [state]
   (->
@@ -58,7 +57,7 @@
 
 (def event-handlers
   {:user-action
-   (fn [screen board events on-draw-done-fn]
+   (fn [screen board]
      (let [k (term/get-key screen)
            updated-board (cond
                            (= k :escape) (do (term/stop screen) board)
@@ -69,25 +68,25 @@
                            (= k :down) (move-when-no-collision board rotate-right)
                            :else board)]
        (when (not= updated-board board) (do-draw screen updated-board))
-       (on-draw-done-fn screen updated-board events)
+       updated-board
        ))
    :gravity-action
-     (fn [screen board events on-draw-done-fn]
+     (fn [screen board]
        (let [updated-board (move-when-no-collision board move-down)
              updated-y (get-in updated-board [:tetromino :current :coords :y])
              current-y (get-in board [:tetromino :current :coords :y])]
          (do-draw screen updated-board)
          (if (= current-y updated-y)
-           (on-draw-done-fn screen (put-next-tetromino updated-board) events)
-           (on-draw-done-fn screen updated-board events))
+           (put-next-tetromino updated-board)
+           updated-board)
          ))})
 
 (defn board-timer [screen board events]
   (chime-at [(-> 50 t/millis t/from-now)]
     (fn [time]
-      (((first events) event-handlers) screen board (rest events) board-timer)
-      ))
-  )
+      (let [board-updated (((first events) event-handlers) screen board)]
+        (board-timer screen board-updated (rest events)))
+      )))
 
 (defn event-codes []
   (let [user-action (repeat 30 :user-action)
