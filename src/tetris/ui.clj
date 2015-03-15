@@ -36,24 +36,17 @@
       next-state)))
 
 (defn do-draw [screen b-updated on-done-fn]
-
   (let [tetro (:current (:tetromino b-updated))
         tetro-bricks (core/move-to-xy (:x (:coords tetro)) (:y (:coords tetro)) (first (:positions tetro)))
         world (clojure.set/union (:heap b-updated) (:wall-bricks (:boundaries b-updated)))
-        all (clojure.set/union tetro-bricks world)
-        s screen]
-
-    (term/clear s)
-    
+        all (clojure.set/union tetro-bricks world)]
+    (term/clear screen)
     (doall
       (map
-        #(term/put-string s (:x %) (- (:top-y (:boundaries b-updated)) (:y %)) "@")
+        #(term/put-string screen (:x %) (- (:top-y (:boundaries b-updated)) (:y %)) "@")
         all))
-
-    (term/redraw s)
-    
-    (on-done-fn b-updated)
-    ))
+    (term/redraw screen)
+    (on-done-fn b-updated)))
 
 (defn put-next-tetromino [state]
   (->
@@ -66,17 +59,19 @@
 (def event-handlers
   {:user-action
    (fn [screen board events on-draw-done-fn]
-     (let [k (term/get-key screen)]
-       (cond
-         (= k :escape) (term/stop screen)
-         (= k :left) (do-draw screen (move-when-no-collision board move-left) #(on-draw-done-fn screen % events))
-         (= k :right) (do-draw screen (move-when-no-collision board move-right) #(on-draw-done-fn screen % events))
-         (= k :enter) (do-draw screen (move-when-no-collision board move-down) #(on-draw-done-fn screen % events))
-         (= k :up) (do-draw screen (move-when-no-collision board rotate-left) #(on-draw-done-fn screen % events))
-         (= k :down) (do-draw screen (move-when-no-collision board rotate-right) #(on-draw-done-fn screen % events))
-         :else (on-draw-done-fn screen board events)
-         ;:else (do-draw screen (move-when-no-collision board move-down) #(board-timer screen %))
-         )))
+     (let [k (term/get-key screen)
+           updated-board (cond
+                           (= k :escape) (term/stop screen)
+                           (= k :left) (move-when-no-collision board move-left)
+                           (= k :right) (move-when-no-collision board move-right)
+                           (= k :enter) (move-when-no-collision board move-down)
+                           (= k :up) (move-when-no-collision board rotate-left)
+                           (= k :down) (move-when-no-collision board rotate-right)
+                           :else board)]
+       (if (= updated-board board)
+         (on-draw-done-fn screen updated-board events)
+         (do-draw screen updated-board #(on-draw-done-fn screen % events)))
+       ))
    :gravity-action
      (fn [screen board events on-draw-done-fn]
        (let [updated-board (move-when-no-collision board move-down)
@@ -85,9 +80,7 @@
          (if (= current-y updated-y)
            (do-draw screen updated-board (fn [n] (on-draw-done-fn screen (put-next-tetromino updated-board) events)))
            (do-draw screen updated-board #(on-draw-done-fn screen % events)))
-         )
-       )
-   })
+         ))})
 
 (defn board-timer [screen board events]
   (chime-at [(-> 50 t/millis t/from-now)]
