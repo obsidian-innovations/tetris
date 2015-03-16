@@ -36,32 +36,27 @@
 
 (defn obj-line-masks [left-x right-x obj]
   (map 
-    #(line-mask left-x right-x %) 
+    #(line-mask left-x right-x %)
     (range (obj-min-y obj) (inc (obj-max-y obj)))))
 
 (defn apply-line-masks [obj masks]
-  (apply difference obj (filter #(= (difference obj %) %) masks)))
+  (apply difference obj (filter #(= (intersection obj %) %) masks)))
 
 (defn remove-complete-lines [left-x right-x obj]
   (apply-line-masks obj (obj-line-masks left-x right-x obj)))
 
-(defn empty-line-ys [bottom-y top-y obj]
-  (sort
-    (seq
-      (intersection
-        (set (range bottom-y (inc top-y)))
-        (walk :y set obj)))))
+(defn bottom-most-empty-y [bottom-y top-y obj]
+  (apply min (difference (set (range bottom-y (inc top-y))) (walk :y set obj))))
 
-(defn collapse-bottom-most-only [bottom-y top-y obj]
-  (reduce 
-    (fn [empty-y]
-      (let [falling (group-by #(> % empty-y))]
-        (merge-objects (move-one-down (true falling)) (false falling)))) 
+(defn collapse-on-y [y obj]
+  (let [falling-objs (group-by #(> (:y %) y) obj)]
+    (union (move-one-down (set (falling-objs true))) (set (falling-objs false)))))
+
+(defn collapse-bottom-most-empty [bottom-y top-y obj]
+  (if (empty? obj)
     obj
-    (take 1 (empty-line-ys bottom-y top-y obj))))
+    (collapse-on-y (bottom-most-empty-y bottom-y top-y obj) obj)))
 
-
-(defn -main
-  "I don't do a whole lot ... yet."
-  [& args]
-  (println "Hello, World!"))
+(defn collapse-all-empty [bottom-y top-y obj]
+  (let [obj-collapsed (collapse-bottom-most-empty bottom-y top-y obj)]
+    (if (= obj obj-collapsed) obj-collapsed (recur bottom-y top-y obj-collapsed))))
