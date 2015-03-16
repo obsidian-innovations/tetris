@@ -76,17 +76,17 @@
       updated-board)
     ))
 
-(defn board-timer [screen board events]
+(defn board-timer [draw-board get-key stop board events]
   (chime-at [(-> 50 t/millis t/from-now)]
     (fn [time]
-      (let [k (term/get-key screen)
+      (let [k (get-key)
             action (reduce apply event-handlers (map vector [(first events) k]))
             board-updated (do-next-board action board)]
         (if (= k :escape)
-          (term/stop screen)
+          (stop)
           (do
-            (do-draw screen board-updated)
-            (board-timer screen board-updated (rest events))
+            (draw-board board-updated)
+            (board-timer draw-board get-key stop board-updated (rest events))
             ))
         ))))
 
@@ -99,9 +99,12 @@
 (defn draw-board []
   (let [board (board/state)
         events (event-codes)
-        screen (term/get-screen)]
+        screen (term/get-screen)
+        draw-board #(do-draw screen %)
+        get-key #(term/get-key screen)
+        stop #(term/stop screen)]
     (term/start screen)
-    (board-timer screen board events)
+    (board-timer draw-board get-key stop board events)
     ))
 
 (defn -main [& args]
