@@ -55,38 +55,40 @@
     (update-in [:heap] #(core/collapse-all-empty 1 14 %))
     (update-in [:tetromino] #(hash-map :current (first (:next %)) :next (rest (:next %))))))
 
+(def action-handlers
+  {:move-down move-down :move-left move-left :move-right move-right
+   :rotate-clockwise rotate-left :rotate-counter-clockwise rotate-right :do-nothing identity})
+
+(def keypress-to-action
+  {:left :move-left :right :move-right :up :rotate-counter-clockwise :down :rotate-clockwise :enter :move-down})
+
 (def event-handlers
-  {:user-action
-   (fn [screen board]
-     (let [k (term/get-key screen)
-           updated-board (cond
-                           (= k :escape) (do (term/stop screen) board)
-                           (= k :left) (move-when-no-collision board move-left)
-                           (= k :right) (move-when-no-collision board move-right)
-                           (= k :enter) (move-when-no-collision board move-down)
-                           (= k :up) (move-when-no-collision board rotate-left)
-                           (= k :down) (move-when-no-collision board rotate-right)
-                           :else board)]
-       (when (not= updated-board board) (do-draw screen updated-board))
-       updated-board
-       ))
-   :gravity-action
-     (fn [screen board]
-       (let [updated-board (move-when-no-collision board move-down)
-             updated-y (get-in updated-board [:tetromino :current :coords :y])
-             current-y (get-in board [:tetromino :current :coords :y])]
-         (do-draw screen updated-board)
-         (if (= current-y updated-y)
-           (put-next-tetromino updated-board)
-           updated-board)
-         ))})
+  {:user-action keypress-to-action
+   :gravity-action (constantly :move-down)})
+
+(defn do-next-board [action-type board]
+  (let [action (get action-handlers action-type identity)
+        updated-board (move-when-no-collision board action)
+        updated-y (get-in updated-board [:tetromino :current :coords :y])
+        current-y (get-in board [:tetromino :current :coords :y])]
+    (if (and (= current-y updated-y) (= action-type :move-down))
+      (put-next-tetromino updated-board)
+      updated-board)
+    ))
 
 (defn board-timer [screen board events]
   (chime-at [(-> 50 t/millis t/from-now)]
     (fn [time]
-      (let [board-updated (((first events) event-handlers) screen board)]
-        (board-timer screen board-updated (rest events)))
-      )))
+      (let [k (term/get-key screen)
+            action (reduce apply event-handlers (map vector [(first events) k]))
+            board-updated (do-next-board action board)]
+        (if (= k :escape)
+          (term/stop screen)
+          (do
+            (do-draw screen board-updated)
+            (board-timer screen board-updated (rest events))
+            ))
+        ))))
 
 (defn event-codes []
   (let [user-action (repeat 30 :user-action)
@@ -95,15 +97,11 @@
     (cycle init-codes)))
 
 (defn draw-board []
-
   (let [board (board/state)
         events (event-codes)
         screen (term/get-screen)]
     (term/start screen)
-
     (board-timer screen board events)
-    
-    
     ))
 
 (defn -main [& args]
