@@ -21,6 +21,9 @@
 (defn rotate-right [state]
   (update-in state [:tetromino :current :positions] rest))
 
+(defn shift-events [state]
+  (update-in state [:events] rest))
+
 (defn move-to-coords [state]
   (core/move-to-xy
     (:x (:coords (:current (:tetromino state))))
@@ -66,45 +69,44 @@
   {:user-action keypress-to-action
    :gravity-action (constantly :move-down)})
 
-(defn do-next-board [action-type board]
-  (let [action (get action-handlers action-type identity)
-        updated-board (move-when-no-collision board action)
-        updated-y (get-in updated-board [:tetromino :current :coords :y])
-        current-y (get-in board [:tetromino :current :coords :y])]
+(defn put-next-when-collision [state-updated state action-type]
+  (let [updated-y (get-in state-updated [:tetromino :current :coords :y])
+        current-y (get-in state [:tetromino :current :coords :y])]
     (if (and (= current-y updated-y) (= action-type :move-down))
-      (put-next-tetromino updated-board)
-      updated-board)
-    ))
+      (put-next-tetromino state-updated)
+      state-updated)))
 
-(defn board-timer [draw-board get-key stop board events]
+(defn do-next-board [action-type board]
+  (let [action (get action-handlers action-type identity)]
+    (-> board
+      (move-when-no-collision action)
+      (put-next-when-collision board action-type)
+      (shift-events))))
+
+(defn board-timer [draw-board get-key stop board]
   (chime-at [(-> 50 t/millis t/from-now)]
     (fn [time]
-      (let [k (get-key)
-            action (reduce apply event-handlers (map vector [(first events) k]))
+      (let [key (get-key)
+            current-event (first (:events board))
+            action (reduce apply event-handlers (map vector [current-event key]))
             board-updated (do-next-board action board)]
-        (if (= k :escape)
+        (if (= key :escape)
           (stop)
           (do
             (draw-board board-updated)
-            (board-timer draw-board get-key stop board-updated (rest events))
+            (board-timer draw-board get-key stop board-updated)
             ))
         ))))
 
-(defn event-codes []
-  (let [user-action (repeat 30 :user-action)
-        gravity-action [:gravity-action]
-        init-codes (flatten (interleave gravity-action (vector user-action)))]
-    (cycle init-codes)))
-
 (defn draw-board []
   (let [board (board/state)
-        events (event-codes)
+;        events (event-codes)
         screen (term/get-screen)
         draw-board #(do-draw screen %)
         get-key #(term/get-key screen)
         stop #(term/stop screen)]
     (term/start screen)
-    (board-timer draw-board get-key stop board events)
+    (board-timer draw-board get-key stop board)
     ))
 
 (defn -main [& args]

@@ -34,7 +34,15 @@
     {:current (first all)
      :next (rest all)}))
 
+(defn init-events []
+  (let [user-action (repeat 30 :user-action)
+        gravity-action [:gravity-action]
+        init-codes (flatten (interleave gravity-action (vector user-action)))]
+    (cycle init-codes)))
+
 (defn state []
   {:boundaries (update-in boundaries [:wall-bricks] (fn [x] (init-bricks boundaries)))
    :tetromino (init-tetromino)
-   :heap #{}})
+   :heap #{}
+   :events (init-events)})
+
