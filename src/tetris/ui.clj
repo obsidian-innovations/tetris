@@ -24,6 +24,9 @@
 (defn shift-events [state]
   (update-in state [:events] rest))
 
+(defn next-tetromino [state]
+  (update-in state [:tetromino] #(hash-map :current (first (:next %)) :next (rest (:next %)))))
+
 (defn move-to-coords [state]
   (core/move-to-xy
     (:x (:coords (:current (:tetromino state))))
@@ -50,13 +53,13 @@
         all))
     (term/redraw screen)))
 
-(defn put-next-tetromino [state]
+(defn put-next-tetromino-when-no-collision [state]
   (->
     state
     (update-in [:heap] #(clojure.set/union % (move-to-coords state)))
     (update-in [:heap] #(core/remove-complete-lines 1 19 %))
     (update-in [:heap] #(core/collapse-all-empty 1 14 %))
-    (update-in [:tetromino] #(hash-map :current (first (:next %)) :next (rest (:next %))))))
+    (move-when-no-collision next-tetromino)))
 
 (def action-handlers
   {:move-down move-down :move-left move-left :move-right move-right
@@ -73,7 +76,7 @@
   (let [updated-y (get-in state-updated [:tetromino :current :coords :y])
         current-y (get-in state [:tetromino :current :coords :y])]
     (if (and (= current-y updated-y) (= action-type :move-down))
-      (put-next-tetromino state-updated)
+      (put-next-tetromino-when-no-collision state-updated)
       state-updated)))
 
 (defn do-next-board [action-type board]
@@ -100,7 +103,6 @@
 
 (defn draw-board []
   (let [board (board/state)
-;        events (event-codes)
         screen (term/get-screen)
         draw-board #(do-draw screen %)
         get-key #(term/get-key screen)
