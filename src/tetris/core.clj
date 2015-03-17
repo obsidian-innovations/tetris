@@ -46,16 +46,17 @@
   (apply-line-masks obj (obj-line-masks left-x right-x obj)))
 
 (defn bottom-most-empty-y [bottom-y top-y obj]
-  (apply min (difference (set (range bottom-y (inc top-y))) (walk :y set obj))))
+  (when-let [empty-ys (seq (difference (set (range bottom-y (inc top-y))) (walk :y set obj)))]
+    (apply min empty-ys)))
 
 (defn collapse-on-y [y obj]
   (let [falling-objs (group-by #(> (:y %) y) obj)]
     (union (move-one-down (set (falling-objs true))) (set (falling-objs false)))))
 
 (defn collapse-bottom-most-empty [bottom-y top-y obj]
-  (if (empty? obj)
-    obj
-    (collapse-on-y (bottom-most-empty-y bottom-y top-y obj) obj)))
+  (if-let [min-empty-y (bottom-most-empty-y bottom-y top-y obj)]
+    (collapse-on-y min-empty-y obj)
+    obj))
 
 (defn collapse-all-empty [bottom-y top-y obj]
   (let [obj-collapsed (collapse-bottom-most-empty bottom-y top-y obj)]
