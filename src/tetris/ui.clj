@@ -2,9 +2,11 @@
   (:require
     [chime :refer [chime-at]]
     [clj-time.core :as t]
-    [tetris.board :as board]
-    [tetris.core :as core]
-    [lanterna.screen :as term :refer :all]))
+    [lanterna.screen :as term :refer :all]
+    [tetris.core :as core :refer :all]
+    [tetris.board :as game :refer :all])
+  ;(:gen-class)
+  )
 
 (defn move-down [state]
   (update-in state [:tetrominos :current :coords :y] dec))
@@ -102,7 +104,7 @@
         ))))
 
 (defn draw-board []
-  (let [board (board/init-state)
+  (let [board (game/init-state)
         screen (term/get-screen)
         draw-board #(do-draw screen %)
         get-key #(term/get-key screen)

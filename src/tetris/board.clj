@@ -2,7 +2,7 @@
   (:require [tetris.tetromino :as t]))
 
 
-(defn- tetromino [sprites]
+(defn- init-tetromino [sprites]
   {:coords {:x 10 :y 15} 
    :sprites sprites
    :positions (cycle sprites)})
@@ -14,10 +14,10 @@
       {:x x :y y})
     (filter #(or (= (% :x) (b :left-x)) (= (% :x) (b :right-x)) (= (% :y) (b :bottom-y))))
     (set)
-    #(assoc b :wall-bricks %)))
+    (assoc b :wall-bricks)))
 
 (defn- init-tetrominos []
-  (let [all (repeatedly #(tetromino (rand-nth tetris.tetromino/all)))]
+  (let [all (repeatedly #(init-tetromino (rand-nth tetris.tetromino/all)))]
     {:current (first all)
      :next (rest all)}))
 

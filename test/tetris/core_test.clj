@@ -1,7 +1,8 @@
 (ns tetris.core-test
-  (:require [clojure.test :refer :all]
-            [tetris.tetromino :refer :all]
-            [tetris.core :refer :all]))
+  (:require
+    [clojure.test :refer :all]
+    [tetris.tetromino :refer :all]
+    [tetris.core :refer :all]))
 
 ;(deftest a-test
 ;  (testing "FIXME, I fail."
