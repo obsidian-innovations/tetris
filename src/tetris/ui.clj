@@ -4,7 +4,7 @@
     [clj-time.core :as t]
     [lanterna.screen :as term :refer :all]
     [tetris.core :as core :refer :all]
-    [tetris.board :as game :refer :all])
+    [tetris.state :as state :refer :all])
   ;(:gen-class)
   )
 
@@ -104,7 +104,7 @@
         ))))
 
 (defn draw-board []
-  (let [board (game/init-state)
+  (let [board (state/init-state)
         screen (term/get-screen)
         draw-board #(do-draw screen %)
         get-key #(term/get-key screen)

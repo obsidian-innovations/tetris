@@ -1,10 +1,10 @@
-(ns tetris.board-test
+(ns tetris.state-test
   (:require [clojure.test :refer :all]
-            [tetris.board :as game :refer :all]
+            [tetris.state :as state :refer :all]
             [tetris.tetromino :as ts :refer :all]))
 
 (deftest init-tetromino
-  (let [t (#'game/init-tetromino ts/i-like)]
+  (let [t (#'state/init-tetromino ts/i-like)]
     (testing "tetromino should have start coords"
       (is (number? (get-in t [:coords :x])))
       (is (number? (get-in t [:coords :y]))))
@@ -28,7 +28,7 @@
             :left-x 0
             :right-x 2
             :wall-bricks #{}}
-        w (#'game/init-wall-bricks w-)]
+        w (#'state/init-wall-bricks w-)]
 
     (testing "should create wall boundary bricks"
       (is

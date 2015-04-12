@@ -1,4 +1,4 @@
-(ns tetris.board
+(ns tetris.state
   (:require [tetris.tetromino :as t]))
 
 
