@@ -7,49 +7,49 @@
     [lanterna.screen :as term :refer :all]))
 
 (defn move-down [state]
-  (update-in state [:tetromino :current :coords :y] dec))
+  (update-in state [:tetrominos :current :coords :y] dec))
 
 (defn move-right [state]
-  (update-in state [:tetromino :current :coords :x] inc))
+  (update-in state [:tetrominos :current :coords :x] inc))
 
 (defn move-left [state]
-  (update-in state [:tetromino :current :coords :x] dec))
+  (update-in state [:tetrominos :current :coords :x] dec))
 
 (defn rotate-left [state]
-  (update-in state [:tetromino :current :positions] #(drop (dec (count (get-in state [:tetromino :current :sprites]))) %)))
+  (update-in state [:tetrominos :current :positions] #(drop (dec (count (get-in state [:tetrominos :current :sprites]))) %)))
 
 (defn rotate-right [state]
-  (update-in state [:tetromino :current :positions] rest))
+  (update-in state [:tetrominos :current :positions] rest))
 
 (defn shift-events [state]
   (update-in state [:events] rest))
 
 (defn next-tetromino [state]
-  (update-in state [:tetromino] #(hash-map :current (first (:next %)) :next (rest (:next %)))))
+  (update-in state [:tetrominos] #(hash-map :current (first (:next %)) :next (rest (:next %)))))
 
 (defn move-to-coords [state]
   (core/move-to-xy
-    (:x (:coords (:current (:tetromino state))))
-    (:y (:coords (:current (:tetromino state))))
-    (first (:positions (:current (:tetromino state))))))
+    (:x (:coords (:current (:tetrominos state))))
+    (:y (:coords (:current (:tetrominos state))))
+    (first (:positions (:current (:tetrominos state))))))
 
 (defn move-when-no-collision [state action]
   (let [next-state (action state)]
     (if (core/collision-detected?
           (move-to-coords next-state)
-          (clojure.set/union (:heap next-state) (:wall-bricks (:boundaries next-state))))
+          (clojure.set/union (:heap next-state) (:wall-bricks (:walls next-state))))
       state
       next-state)))
 
 (defn do-draw [screen b-updated]
-  (let [tetro (:current (:tetromino b-updated))
+  (let [tetro (:current (:tetrominos b-updated))
         tetro-bricks (core/move-to-xy (:x (:coords tetro)) (:y (:coords tetro)) (first (:positions tetro)))
-        world (clojure.set/union (:heap b-updated) (:wall-bricks (:boundaries b-updated)))
+        world (clojure.set/union (:heap b-updated) (:wall-bricks (:walls b-updated)))
         all (clojure.set/union tetro-bricks world)]
     (term/clear screen)
     (doall
       (map
-        #(term/put-string screen (:x %) (- (:top-y (:boundaries b-updated)) (:y %)) "@")
+        #(term/put-string screen (:x %) (- (:top-y (:walls b-updated)) (:y %)) "@")
         all))
     (term/redraw screen)))
 
@@ -73,8 +73,8 @@
    :gravity-action (constantly :move-down)})
 
 (defn put-next-when-collision [state-updated state action-type]
-  (let [updated-y (get-in state-updated [:tetromino :current :coords :y])
-        current-y (get-in state [:tetromino :current :coords :y])]
+  (let [updated-y (get-in state-updated [:tetrominos :current :coords :y])
+        current-y (get-in state [:tetrominos :current :coords :y])]
     (if (and (= current-y updated-y) (= action-type :move-down))
       (put-next-tetromino-when-no-collision state-updated)
       state-updated)))
@@ -102,7 +102,7 @@
         ))))
 
 (defn draw-board []
-  (let [board (board/state)
+  (let [board (board/init-state)
         screen (term/get-screen)
         draw-board #(do-draw screen %)
         get-key #(term/get-key screen)
