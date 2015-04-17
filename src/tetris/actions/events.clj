@@ -1,4 +1,6 @@
-(ns tetris.events)
+(ns tetris.actions.events
+  (:require
+    [tetris.actions.tetromino :refer :all]))
 
 (def action-handlers
   {:move-down move-down

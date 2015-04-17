@@ -1,4 +1,7 @@
-(ns tetris.actions.utils)
+(ns tetris.actions.utils
+  (:require
+    [clojure.walk :refer :all]
+    [clojure.set :refer :all]))
 
 (defn collision-detected? [obj world]
   (not (empty? (intersection obj world))))

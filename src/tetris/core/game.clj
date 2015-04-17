@@ -1,6 +1,5 @@
-(ns tetris.state
-  (:require [tetris.tetromino :as t]))
-
+(ns tetris.core.game
+  (:require [tetris.core.tetrominos :as ts]))
 
 (defn- init-tetromino [sprites]
   {:coords {:x 10 :y 15} 
@@ -17,7 +16,7 @@
     (assoc b :wall-bricks)))
 
 (defn- init-tetrominos []
-  (let [all (repeatedly #(init-tetromino (rand-nth tetris.tetromino/all)))]
+  (let [all (repeatedly #(init-tetromino (rand-nth ts/all)))]
     {:current (first all)
      :next (rest all)}))
 

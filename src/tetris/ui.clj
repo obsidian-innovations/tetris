@@ -3,12 +3,15 @@
     [chime :refer [chime-at]]
     [clj-time.core :as t]
     [lanterna.screen :as term :refer :all]
-    [tetris.core :as core :refer :all]
-    [tetris.state :as state :refer :all]))
+    [tetris.actions.common :refer [move-to-xy]]
+    [tetris.actions.events :refer :all]
+    [tetris.actions.game :refer :all]
+    [tetris.actions.events :refer :all]
+    [tetris.core.game :as state :refer :all]))
 
 (defn do-draw [screen b-updated]
   (let [tetro (:current (:tetrominos b-updated))
-        tetro-bricks (core/move-to-xy (:x (:coords tetro)) (:y (:coords tetro)) (first (:positions tetro)))
+        tetro-bricks (move-to-xy (:x (:coords tetro)) (:y (:coords tetro)) (first (:positions tetro)))
         world (clojure.set/union (:heap b-updated) (:wall-bricks (:walls b-updated)))
         all (clojure.set/union tetro-bricks world)]
     (term/clear screen)

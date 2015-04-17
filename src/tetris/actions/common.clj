@@ -1,4 +1,7 @@
-(ns tetris.actions.common)
+(ns tetris.actions.common
+  (:require
+    [clojure.set :refer :all]
+    [tetris.actions.utils :refer :all]))
 
 (defn move-to-xy [x y obj]
   (set
@@ -16,15 +19,15 @@
 (defn merge-objects [& objs]
   (union objs))
 
+(defn apply-line-masks [obj masks]
+  (apply difference obj (filter #(= (intersection obj %) %) masks)))
+
 (defn remove-complete-lines [left-x right-x obj]
   (apply-line-masks obj (obj-line-masks left-x right-x obj)))
 
 (defn collapse-on-y [y obj]
   (let [falling-objs (group-by #(> (:y %) y) obj)]
     (union (move-one-down (set (falling-objs true))) (set (falling-objs false)))))
-
-(defn apply-line-masks [obj masks]
-  (apply difference obj (filter #(= (intersection obj %) %) masks)))
 
 (defn collapse-bottom-most-empty [bottom-y top-y obj]
   (if-let [min-empty-y (bottom-most-empty-y bottom-y top-y obj)]
