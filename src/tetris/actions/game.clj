@@ -4,6 +4,9 @@
     [tetris.actions.common :refer :all]
     [tetris.actions.events :as es :refer :all]))
 
+(defn bricks [state]
+  (reduce clojure.set/union [(move-to-coords state) (:heap state) (get-in state [:walls :wall-bricks])]))
+
 (defn shift-events [state]
   (update-in state [:events] rest))
 
