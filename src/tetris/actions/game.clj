@@ -25,9 +25,11 @@
       (put-next-tetromino-when-no-collision state-updated)
       state-updated)))
 
-(defn do-next-board [action-type board]
-  (let [action (get es/action-handlers action-type identity)]
-    (-> board
-      (move-when-no-collision action)
-      (put-next-when-collision board action-type)
+
+(defn handle-next-event [user-action game]
+  (let [event (first (:events game))
+        action-type ((es/event-handlers event) user-action)]
+    (-> game
+      (move-when-no-collision (es/action-handlers action-type))
+      (put-next-when-collision game action-type)
       (shift-events))))

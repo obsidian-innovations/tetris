@@ -21,7 +21,7 @@
      :next (rest all)}))
 
 (defn- init-events []
-  (let [user-action (repeat 30 :user-action)
+  (let [user-action (repeat 20 :user-action)
         gravity-action [:gravity-action]
         init-codes (flatten (interleave gravity-action (vector user-action)))]
     (cycle init-codes)))

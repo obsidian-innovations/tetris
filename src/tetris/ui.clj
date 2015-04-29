@@ -9,7 +9,14 @@
     [tetris.actions.events :refer :all]
     [tetris.core.game :as state :refer :all]))
 
-(defn do-draw [screen game]
+(def keypress-to-action
+  {:left :move-left
+   :right :move-right
+   :up :rotate-counter-clockwise
+   :down :rotate-clockwise
+   :enter :move-down})
+
+(defn print-game-to-screen [game screen]
   (term/clear screen)
   (doall
     (map
@@ -17,30 +24,26 @@
       (bricks game)))
   (term/redraw screen))
 
-(defn board-timer [draw-board get-key stop board]
-  (chime-at [(-> 50 t/millis t/from-now)]
+(defn schedule-next-move [print-game-fn get-key-fn stop-game-fn game]
+  (chime-at [(-> 40 t/millis t/from-now)]
     (fn [_]
-      (let [key (get-key)
-            current-event (first (:events board))
-            action (reduce apply event-handlers (map vector [current-event key]))
-            board-updated (do-next-board action board)]
-        (if (= key :escape)
-          (stop)
+      (let [key-pressed (get-key-fn)
+            user-action (get keypress-to-action key-pressed :do-nothing)
+            game-updated (handle-next-event user-action game)]
+        (if (= key-pressed :escape)
+          (stop-game-fn)
           (do
-            (draw-board board-updated)
-            (board-timer draw-board get-key stop board-updated)
-            ))
-        ))))
+            (print-game-fn game-updated)
+            (schedule-next-move print-game-fn get-key-fn stop-game-fn game-updated)))))))
 
-(defn draw-board []
+(defn start-game []
   (let [board (state/init-state)
         screen (term/get-screen)
-        draw-board-fn #(do-draw screen %)
+        print-game-fn #(print-game-to-screen % screen)
         get-key-fn #(term/get-key screen)
         stop-fn #(term/stop screen)]
     (term/start screen)
-    (board-timer draw-board-fn get-key-fn stop-fn board)
-    ))
+    (schedule-next-move print-game-fn get-key-fn stop-fn board)))
 
 (defn -main [& args]
-  (draw-board))
+  (start-game))
