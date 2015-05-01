@@ -16,11 +16,12 @@
    :down :rotate-clockwise
    :enter :move-down})
 
+;http://www.rapidtables.com/code/text/ascii-table.htm
 (defn print-game-to-screen [game screen]
   (term/clear screen)
   (doall
     (map
-      #(term/put-string screen (:x %) (- (:top-y (:walls game)) (:y %)) "@")
+      #(term/put-string screen (* (:x %) 2) (- (:top-y (:walls game)) (:y %)) "▒░")
       (bricks game)))
   (term/redraw screen))
 
