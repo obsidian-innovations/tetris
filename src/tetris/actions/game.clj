@@ -1,5 +1,6 @@
 (ns tetris.actions.game
   (:require
+    [tetris.core.config :as config]
     [tetris.actions.tetromino :refer :all]
     [tetris.actions.common :refer :all]
     [tetris.actions.events :as es :refer :all]))
@@ -14,8 +15,8 @@
   (->
     state
     (update-in [:heap] #(clojure.set/union % (move-to-coords state)))
-    (update-in [:heap] #(remove-complete-lines 1 19 %))
-    (update-in [:heap] #(collapse-all-empty 1 14 %))
+    (update-in [:heap] #(remove-complete-lines 1 (:board-width config/main) %))
+    (update-in [:heap] #(collapse-all-empty 1 (:board-heigh config/main) %))
     (move-when-no-collision next-tetromino)))
 
 (defn put-next-when-collision [state-updated state action-type]

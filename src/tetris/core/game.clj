@@ -1,8 +1,10 @@
 (ns tetris.core.game
-  (:require [tetris.core.tetrominos :as ts]))
+  (:require
+    [tetris.core.config :as config]
+    [tetris.core.tetrominos :as ts]))
 
 (defn- init-tetromino [sprites]
-  {:coords {:x 10 :y 15} 
+  {:coords {:x (/ (:board-width config/main) 2) :y (:board-heigh config/main)}
    :sprites sprites
    :positions (cycle sprites)})
 
@@ -21,7 +23,7 @@
      :next (rest all)}))
 
 (defn- init-events []
-  (let [user-action (repeat 20 :user-action)
+  (let [user-action (repeat (:gravity-event-frequency config/main) :user-action)
         gravity-action [:gravity-action]
         init-codes (flatten (interleave gravity-action (vector user-action)))]
     (cycle init-codes)))
@@ -29,9 +31,9 @@
 (defn- init-walls []
   (init-wall-bricks
     {:bottom-y 0
-     :top-y 15
+     :top-y (:board-heigh config/main)
      :left-x 0
-     :right-x 20
+     :right-x (inc (:board-width config/main))
      :wall-bricks #{}}))
 
 (defn init-state []
