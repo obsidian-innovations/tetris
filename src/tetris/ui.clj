@@ -65,7 +65,7 @@
     ))
 
 (defn schedule-next-move [print-game-fn get-key-fn stop-game-fn game]
-  (chime-at [(-> 40 t/millis t/from-now)]
+  (chime-at [(-> 50 t/millis t/from-now)]
     (fn [_]
       (let [key-pressed (get-key-fn)
             user-action (get keypress-to-action key-pressed :do-nothing)
