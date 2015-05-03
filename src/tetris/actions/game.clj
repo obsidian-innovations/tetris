@@ -11,13 +11,14 @@
 (defn shift-events [state]
   (update-in state [:events] rest))
 
-(defn put-next-tetromino-when-no-collision [state]
-  (->
-    state
-    (update-in [:heap] #(clojure.set/union % (move-to-coords state)))
-    (update-in [:heap] #(remove-complete-lines 1 (:board-width config/main) %))
-    (update-in [:heap] #(collapse-all-empty 1 (:board-heigh config/main) %))
-    (move-when-no-collision next-tetromino)))
+(defn put-next-tetromino-when-no-collision [game]
+  (let [g0 (update-in game [:heap] #(clojure.set/union % (move-to-coords game)))
+        cls (complete-lines 1 (:board-width config/main) (:heap g0))]
+    (->
+      g0
+      (update-in [:heap] #(remove-complete-lines % (set (flatten cls))))
+      (update-in [:heap] #(collapse-all-empty 1 (:board-heigh config/main) %))
+      (move-when-no-collision next-tetromino))))
 
 (defn put-next-when-collision [state-updated state action-type]
   (let [updated-y (get-in state-updated [:tetrominos :current :coords :y])

@@ -19,11 +19,13 @@
 (defn merge-objects [& objs]
   (union objs))
 
-(defn apply-line-masks [obj masks]
-  (apply difference obj (filter #(= (intersection obj %) %) masks)))
+(defn complete-lines [left-x right-x obj]
+  (let [lines (group-by :y obj)
+        line-length (inc (- right-x left-x))]
+    (filter #(= (count %) line-length) (vals lines))))
 
-(defn remove-complete-lines [left-x right-x obj]
-  (apply-line-masks obj (obj-line-masks left-x right-x obj)))
+(defn remove-complete-lines [obj lines]
+  (difference obj lines))
 
 (defn collapse-on-y [y obj]
   (let [falling-objs (group-by #(> (:y %) y) obj)]
