@@ -8,7 +8,8 @@
     [tetris.actions.events :refer :all]
     [tetris.actions.game :refer :all]
     [tetris.actions.events :refer :all]
-    [tetris.core.game :as state :refer :all]))
+    [tetris.core.game :as state :refer :all]
+    [tetris.core.config :as config]))
 
 (def keypress-to-action
   {:left :move-left
@@ -17,12 +18,15 @@
    :down :rotate-clockwise
    :enter :move-down})
 
-(defn- convert-coords-to-screen [game coords]
-  (let [top-y (:top-y (:walls game))]
-    (map #(hash-map :x (* (:x %) 2) :y (- top-y (:y %))) coords)))
+(defn- convert-coords-to-screen [screen game coords]
+  (let [top-y (:top-y (:walls game))
+        [cols rows] (term/get-size screen)
+        offset-x (- (/ cols 2) (:board-width config/main))
+        offset-y (- (/ rows 2) (/ (:board-heigh config/main) 2))]
+    (map #(hash-map :x (+ (* (:x %) 2) offset-x) :y (+ (- top-y (:y %)) offset-y)) coords)))
 
 (defn- print-tetromino-to-screen! [screen game coords charset]
-  (let [bricks (convert-coords-to-screen game coords)]
+  (let [bricks (convert-coords-to-screen screen game coords)]
     (doall (map #(term/put-string screen (:x %) (:y %) charset) bricks))
     ))
 
@@ -36,7 +40,7 @@
     ))
 
 (defn- print-heap-to-screen! [screen game coords charset]
-  (let [bricks (convert-coords-to-screen game coords)]
+  (let [bricks (convert-coords-to-screen screen game coords)]
     (doall (map #(term/put-string screen (:x %) (:y %) charset) bricks))
     ))
 
@@ -50,9 +54,9 @@
         ))
     ))
 
-(defn- print-walls-to-screen [screen game]
+(defn- print-walls-to-screen! [screen game]
   (let [coords (get-in game [:walls :wall-bricks])
-        bricks (convert-coords-to-screen game coords)]
+        bricks (convert-coords-to-screen screen game coords)]
     (doall (map #(term/put-string screen (:x %) (:y %) "▓▓") bricks))
     ))
 
@@ -84,7 +88,7 @@
         stop-fn #(term/stop screen)]
     (term/start screen)
     (term/clear screen)
-    (print-walls-to-screen screen board)
+    (print-walls-to-screen! screen board)
     (schedule-next-move print-game-fn get-key-fn stop-fn board)))
 
 (defn -main [& args]
