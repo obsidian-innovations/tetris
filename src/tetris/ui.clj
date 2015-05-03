@@ -39,6 +39,28 @@
         (print-tetromino-to-screen! screen game coords "▒░")))
     ))
 
+(defn- print-next-tetromino!
+  ([screen game coords]
+   (print-tetromino-to-screen! screen game (move-to-xy -6 (- (:top-y (:walls game)) 5) coords) "▒░"))
+  ([screen game]
+    (let [coords (-> game (:tetrominos) (:next) (first) (:positions) (first))]
+      (print-next-tetromino! screen game coords))))
+
+(defn- clear-next-tetromino!
+  ([screen game coords]
+   (print-tetromino-to-screen! screen game (move-to-xy -6 (- (:top-y (:walls game)) 5) coords) "  "))
+  ([screen game]
+   (let [coords (-> game (:tetrominos) (:next) (first) (:positions) (first))]
+     (print-next-tetromino! screen game coords))))
+
+(defn- animate-next-tetromino-to-screen! [screen game game-old]
+  (let [coords-old (-> game-old (:tetrominos) (:next) (first) (:positions) (first))
+        coords (-> game (:tetrominos) (:next) (first) (:positions) (first))]
+    (if-not (= coords-old coords)
+      (do
+        (clear-next-tetromino! screen game-old coords-old)
+        (print-next-tetromino! screen game coords)))))
+
 (defn- print-heap-to-screen! [screen game coords charset]
   (let [bricks (convert-coords-to-screen screen game coords)]
     (doall (map #(term/put-string screen (:x %) (:y %) charset) bricks))
@@ -63,6 +85,7 @@
 ;http://www.rapidtables.com/code/text/ascii-table.htm
 (defn- print-game-to-screen [screen game game-old]
   (let []
+    (animate-next-tetromino-to-screen! screen game game-old)
     (animate-tetromino-to-screen! screen game game-old)
     (animate-heap-to-screen! screen game game-old)
     (term/redraw screen)
@@ -81,15 +104,16 @@
             (schedule-next-move print-game-fn get-key-fn stop-game-fn game-updated)))))))
 
 (defn start-game []
-  (let [board (state/init-state)
+  (let [game (state/init-state)
         screen (term/get-screen)
         print-game-fn #(print-game-to-screen screen %1 %2)
         get-key-fn #(term/get-key screen)
         stop-fn #(term/stop screen)]
     (term/start screen)
     (term/clear screen)
-    (print-walls-to-screen! screen board)
-    (schedule-next-move print-game-fn get-key-fn stop-fn board)))
+    (print-walls-to-screen! screen game)
+    (print-next-tetromino! screen game)
+    (schedule-next-move print-game-fn get-key-fn stop-fn game)))
 
 (defn -main [& args]
   (start-game))
