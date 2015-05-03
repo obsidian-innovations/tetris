@@ -13,10 +13,11 @@
 
 (defn put-next-tetromino-when-no-collision [game]
   (let [g0 (update-in game [:heap] #(clojure.set/union % (move-to-coords game)))
-        cls (complete-lines 1 (:board-width config/main) (:heap g0))]
+        cls (completed-lines 1 (:board-width config/main) (:heap g0))]
     (->
       g0
       (update-in [:heap] #(remove-complete-lines % (set (flatten cls))))
+      (update-in [:stats :completed-lines-count] #(+ % (count cls)))
       (update-in [:heap] #(collapse-all-empty 1 (:board-heigh config/main) %))
       (move-when-no-collision next-tetromino))))
 

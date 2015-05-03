@@ -19,7 +19,7 @@
 (defn merge-objects [& objs]
   (union objs))
 
-(defn complete-lines [left-x right-x obj]
+(defn completed-lines [left-x right-x obj]
   (let [lines (group-by :y obj)
         line-length (inc (- right-x left-x))]
     (filter #(= (count %) line-length) (vals lines))))

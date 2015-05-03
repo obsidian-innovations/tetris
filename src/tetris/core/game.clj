@@ -24,9 +24,8 @@
 
 (defn- init-events []
   (let [s1 (repeat (:gravity-event-frequency config/main) [:user-action])
-        s2 [[:user-action :gravity-action]]
-        s3 (concat s1 s2)]
-    (cycle s3)))
+        s2 [[:user-action :gravity-action]]]
+    (cycle (concat s1 s2))))
 
 (defn- init-walls []
   (init-wall-bricks
@@ -36,8 +35,12 @@
      :right-x (inc (:board-width config/main))
      :wall-bricks #{}}))
 
+(defn- init-stats []
+  {:completed-lines-count 0})
+
 (defn init-state []
   {:walls (init-walls)
    :tetrominos (init-tetrominos)
    :heap #{}
+   :stats (init-stats)
    :events (init-events)})
