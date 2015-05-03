@@ -3,4 +3,4 @@
 (def main
   {:board-width 10
    :board-heigh 20
-   :gravity-event-frequency 30})
+   :gravity-event-frequency 15})

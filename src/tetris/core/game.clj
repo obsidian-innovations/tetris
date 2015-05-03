@@ -23,10 +23,10 @@
      :next (rest all)}))
 
 (defn- init-events []
-  (let [user-action (repeat (:gravity-event-frequency config/main) :user-action)
-        gravity-action [:gravity-action]
-        init-codes (flatten (interleave gravity-action (vector user-action)))]
-    (cycle init-codes)))
+  (let [s1 (repeat (:gravity-event-frequency config/main) [:user-action])
+        s2 [[:user-action :gravity-action]]
+        s3 (concat s1 s2)]
+    (cycle s3)))
 
 (defn- init-walls []
   (init-wall-bricks

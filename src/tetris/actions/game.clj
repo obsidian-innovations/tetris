@@ -26,11 +26,14 @@
       (put-next-tetromino-when-no-collision state-updated)
       state-updated)))
 
-
-(defn handle-next-event [user-action game]
-  (let [event (first (:events game))
-        action-type ((es/event-handlers event) user-action)]
+(defn handle-event [event user-action game]
+  (let [action-type ((es/event-handlers event) user-action)]
     (-> game
-      (move-when-no-collision (es/action-handlers action-type))
-      (put-next-when-collision game action-type)
+        (move-when-no-collision (es/action-handlers action-type))
+        (put-next-when-collision game action-type))))
+
+(defn handle-next-events-batch [user-action game]
+  (let [events (first (:events game))]
+    (->
+      (reduce #(handle-event %2 user-action %1) game events)
       (shift-events))))

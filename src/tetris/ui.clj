@@ -69,7 +69,7 @@
     (fn [_]
       (let [key-pressed (get-key-fn)
             user-action (get keypress-to-action key-pressed :do-nothing)
-            game-updated (handle-next-event user-action game)]
+            game-updated (handle-next-events-batch user-action game)]
         (if (= key-pressed :escape)
           (stop-game-fn)
           (do
