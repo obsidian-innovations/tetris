@@ -82,12 +82,18 @@
     (doall (map #(term/put-string screen (:x %) (:y %) "▓▓") bricks))
     ))
 
+(defn- print-completed-lines! [screen game]
+  (let [coords [{:x (+ (:board-width config/main) 6) :y (- (:top-y (:walls game)) 5)}]]
+    (print-tetromino-to-screen! screen game coords (str "Lines cleared: " (:completed-lines-count (:stats game))))
+    ))
+
 ;http://www.rapidtables.com/code/text/ascii-table.htm
 (defn- print-game-to-screen [screen game game-old]
   (let []
     (animate-next-tetromino-to-screen! screen game game-old)
     (animate-tetromino-to-screen! screen game game-old)
     (animate-heap-to-screen! screen game game-old)
+    (print-completed-lines! screen game)
     (term/redraw screen)
     ))
 
