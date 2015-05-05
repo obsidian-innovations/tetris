@@ -10,13 +10,6 @@
    :rotate-counter-clockwise rotate-right
    :do-nothing identity})
 
-(def keypress-to-action
-  {:left :move-left
-   :right :move-right
-   :up :rotate-counter-clockwise
-   :down :rotate-clockwise
-   :enter :move-down})
-
 (def event-handlers
-  {:user-action keypress-to-action
+  {:user-action identity
    :gravity-action (constantly :move-down)})
