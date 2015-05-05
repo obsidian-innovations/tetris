@@ -32,7 +32,7 @@ Remember, that playing Tetris
  
  - Can potentially reduce flashbacks for the people suffering posttraumatic stress disorder.
 
-As identified by the "[Effect of Tetris on the brain](http://en.wikipedia.org/wiki/Tetris#Effect_of_Tetris_on_the_brain)" by Wikipedia.
+As identified in the "[Effect of Tetris on the brain](http://en.wikipedia.org/wiki/Tetris#Effect_of_Tetris_on_the_brain)" by Wikipedia.
 
  
 ## License
