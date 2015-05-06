@@ -1,6 +1,6 @@
 (ns tetris.core.game
   (:require
-    [tetris.actions.game :as ag :refer [events]]
+    [tetris.actions.game :as ag :refer [generate-events-chain]]
     [tetris.core.config :as config]
     [tetris.core.tetrominos :as ts]))
 
@@ -24,7 +24,7 @@
      :next (rest all)}))
 
 (defn- init-events []
-  (ag/events (:gravity-event-frequency config/main)))
+  (ag/generate-events-chain (:gravity-event-frequency config/main)))
 
 (defn- init-walls []
   (init-wall-bricks

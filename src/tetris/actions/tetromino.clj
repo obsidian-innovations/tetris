@@ -4,6 +4,9 @@
     [tetris.actions.utils :refer :all]
     [tetris.actions.common :refer :all]))
 
+(defn lines-count [game]
+  (get-in game [:stats :completed-lines-count]))
+
 (defn move-down [state]
   (update-in state [:tetrominos :current :coords :y] dec))
 

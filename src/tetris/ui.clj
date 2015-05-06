@@ -88,7 +88,7 @@
     ))
 
 ;http://www.rapidtables.com/code/text/ascii-table.htm
-(defn- print-game-to-screen [screen game game-old]
+(defn- print-game-to-screen! [screen game game-old]
   (let []
     (animate-next-tetromino-to-screen! screen game game-old)
     (animate-tetromino-to-screen! screen game game-old)
@@ -112,7 +112,7 @@
 (defn start-game []
   (let [game (state/init-state)
         screen (term/get-screen)
-        print-game-fn #(print-game-to-screen screen %1 %2)
+        print-game-fn #(print-game-to-screen! screen %1 %2)
         get-key-fn #(term/get-key screen)
         stop-fn #(term/stop screen)]
     (term/start screen)
