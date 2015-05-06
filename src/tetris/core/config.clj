@@ -3,7 +3,6 @@
 (def main
   {:board-width 10
    :board-heigh 20
-   :gravity-event-frequency 15
    :levels
     [{:lines-cleared  0 :gravity-event-frequency 15 :level 0}
      {:lines-cleared 15 :gravity-event-frequency 13 :level 1}

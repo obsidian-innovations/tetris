@@ -19,6 +19,11 @@
         s2 [[:user-action :gravity-action]]]
     (cycle (concat s1 s2))))
 
+(defn generate-events-chain-by-lines-count [count]
+  (generate-events-chain
+    (:gravity-event-frequency
+      (get-level count))))
+
 (defn update-events [game events]
   (assoc-in game [:events] events))
 
@@ -55,5 +60,5 @@
   (let [events (first (:events game))
         game-updated (handle-events events user-action game)]
     (if (> (lines-count game-updated) (lines-count game))
-      (update-events game-updated (generate-events-chain (:gravity-event-frequency (get-level (lines-count game-updated)))))
+      (update-events game-updated (generate-events-chain-by-lines-count (lines-count game-updated)))
       (shift-events game-updated))))
