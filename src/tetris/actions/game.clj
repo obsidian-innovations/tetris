@@ -8,6 +8,14 @@
 (defn bricks [state]
   (reduce clojure.set/union [(move-to-coords state) (:heap state) (get-in state [:walls :wall-bricks])]))
 
+(defn events [gravity-event-frequency]
+  (let [s1 (repeat gravity-event-frequency [:user-action])
+        s2 [[:user-action :gravity-action]]]
+    (cycle (concat s1 s2))))
+
+(defn update-events [game events]
+  (update-in game [:events] events))
+
 (defn shift-events [state]
   (update-in state [:events] rest))
 
