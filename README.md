@@ -18,7 +18,16 @@ In order to start the application you'll need to have [Leiningen](http://leining
 Run the following command in console:
 
     lein run
+
   
+## Control keys
+
+- *Up* - rotate counter-clockwise
+- *Down* - rotate clockwise
+- *Left* - move left
+- *Right* - move right
+- *Enter* - speed up
+
 
 ## Things to remember
 
