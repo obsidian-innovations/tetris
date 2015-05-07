@@ -83,9 +83,18 @@
     ))
 
 (defn- print-completed-lines! [screen game]
-  (let [coords [{:x (+ (:board-width config/main) 6) :y (- (:top-y (:walls game)) 5)}]]
-    (print-tetromino-to-screen! screen game coords (str "Lines cleared: " (:completed-lines-count (:stats game))))
-    ))
+  (let [coords [{:x (+ (:board-width config/main) 6) :y (- (:top-y (:walls game)) 5)}]
+        lines (:completed-lines-count (:stats game))]
+    (print-tetromino-to-screen! screen game coords (str "Lines cleared: " lines))))
+
+(defn- print-current-level! [screen game]
+  (let [coords [{:x (+ (:board-width config/main) 6) :y (- (:top-y (:walls game)) 7)}]
+        level (:level (get-level (:completed-lines-count (:stats game))))]
+    (print-tetromino-to-screen! screen game coords (str "Level:         " level))))
+
+(defn- animate-current-level! [screen game game-old]
+  (when (lines-cleared? game game-old)
+    (print-current-level! screen game)))
 
 ;http://www.rapidtables.com/code/text/ascii-table.htm
 (defn- print-game-to-screen! [screen game game-old]
@@ -93,9 +102,9 @@
     (animate-next-tetromino-to-screen! screen game game-old)
     (animate-tetromino-to-screen! screen game game-old)
     (animate-heap-to-screen! screen game game-old)
+    (animate-current-level! screen game game-old)
     (print-completed-lines! screen game)
-    (term/redraw screen)
-    ))
+    (term/redraw screen)))
 
 (defn schedule-next-move [print-game-fn get-key-fn stop-game-fn game]
   (chime-at [(-> 50 t/millis t/from-now)]
@@ -119,6 +128,7 @@
     (term/clear screen)
     (print-walls-to-screen! screen game)
     (print-next-tetromino! screen game)
+    (print-current-level! screen game)
     (schedule-next-move print-game-fn get-key-fn stop-fn game)))
 
 (defn -main [& args]

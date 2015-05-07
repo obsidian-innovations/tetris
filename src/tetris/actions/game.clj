@@ -56,9 +56,12 @@
 (defn handle-events [events user-action game]
   (reduce #(handle-event %2 user-action %1) game events))
 
+(defn lines-cleared? [game-updated game]
+  (> (lines-count game-updated) (lines-count game)))
+
 (defn handle-next-events-batch [user-action game]
   (let [events (first (:events game))
         game-updated (handle-events events user-action game)]
-    (if (> (lines-count game-updated) (lines-count game))
+    (if (lines-cleared? game-updated game)
       (update-events game-updated (generate-events-chain-by-lines-count (lines-count game-updated)))
       (shift-events game-updated))))
