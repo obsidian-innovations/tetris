@@ -27,8 +27,7 @@
 
 (defn- print-tetromino-to-screen! [screen game coords charset]
   (let [bricks (convert-coords-to-screen screen game coords)]
-    (doall (map #(term/put-string screen (:x %) (:y %) charset) bricks))
-    ))
+    (doall (map #(term/put-string screen (:x %) (:y %) charset) bricks))))
 
 (defn- animate-tetromino-to-screen! [screen game game-old]
   (let [coords-old (move-to-coords game-old)
@@ -36,8 +35,7 @@
     (if-not (= coords-old coords)
       (do
         (print-tetromino-to-screen! screen game-old coords-old "  ")
-        (print-tetromino-to-screen! screen game coords "▒░")))
-    ))
+        (print-tetromino-to-screen! screen game coords "▒░")))))
 
 (defn- print-next-tetromino!
   ([screen game coords]
@@ -63,8 +61,7 @@
 
 (defn- print-heap-to-screen! [screen game coords charset]
   (let [bricks (convert-coords-to-screen screen game coords)]
-    (doall (map #(term/put-string screen (:x %) (:y %) charset) bricks))
-    ))
+    (doall (map #(term/put-string screen (:x %) (:y %) charset) bricks))))
 
 (defn- animate-heap-to-screen! [screen game game-old]
   (let [coords (:heap game)
@@ -72,30 +69,36 @@
     (if-not (= coords-old coords)
       (do
         (print-heap-to-screen! screen game-old coords-old "  ")
-        (print-heap-to-screen! screen game coords "▒░")
-        ))
-    ))
+        (print-heap-to-screen! screen game coords "▒░")))))
 
 (defn- print-walls-to-screen! [screen game]
   (let [coords (get-in game [:walls :wall-bricks])
         bricks (convert-coords-to-screen screen game coords)]
-    (doall (map #(term/put-string screen (:x %) (:y %) "▓▓") bricks))
-    ))
+    (doall (map #(term/put-string screen (:x %) (:y %) "▓▓") bricks))))
 
 (defn- print-completed-lines! [screen game]
-  (let [coords [{:x (+ (:board-width config/main) 6) :y (- (:top-y (:walls game)) 5)}]]
-    (print-tetromino-to-screen! screen game coords (str "Lines cleared: " (:completed-lines-count (:stats game))))
-    ))
+  (let [coords [{:x (+ (:board-width config/main) 6) :y (- (:top-y (:walls game)) 5)}]
+        lines (:completed-lines-count (:stats game))]
+    (print-tetromino-to-screen! screen game coords (str "Lines cleared: " lines))))
+
+(defn- print-current-level! [screen game]
+  (let [coords [{:x (+ (:board-width config/main) 6) :y (- (:top-y (:walls game)) 7)}]
+        level (:level (get-level (:completed-lines-count (:stats game))))]
+    (print-tetromino-to-screen! screen game coords (str "Level:         " level))))
+
+(defn- print-current-level-if-changed! [screen game game-old]
+  (when (lines-cleared? game game-old)
+    (print-current-level! screen game)))
 
 ;http://www.rapidtables.com/code/text/ascii-table.htm
-(defn- print-game-to-screen [screen game game-old]
+(defn- print-game-to-screen! [screen game game-old]
   (let []
     (animate-next-tetromino-to-screen! screen game game-old)
     (animate-tetromino-to-screen! screen game game-old)
     (animate-heap-to-screen! screen game game-old)
+    (print-current-level-if-changed! screen game game-old)
     (print-completed-lines! screen game)
-    (term/redraw screen)
-    ))
+    (term/redraw screen)))
 
 (defn schedule-next-move [print-game-fn get-key-fn stop-game-fn game]
   (chime-at [(-> 50 t/millis t/from-now)]
@@ -112,13 +115,14 @@
 (defn start-game []
   (let [game (state/init-state)
         screen (term/get-screen)
-        print-game-fn #(print-game-to-screen screen %1 %2)
+        print-game-fn #(print-game-to-screen! screen %1 %2)
         get-key-fn #(term/get-key screen)
         stop-fn #(term/stop screen)]
     (term/start screen)
     (term/clear screen)
     (print-walls-to-screen! screen game)
     (print-next-tetromino! screen game)
+    (print-current-level! screen game)
     (schedule-next-move print-game-fn get-key-fn stop-fn game)))
 
 (defn -main [& args]

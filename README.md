@@ -3,7 +3,9 @@
 
 A Clojure based engine for the game of *TETRIS*. 
 
-Simple text-based UI is also included.
+![Console UI for the game engine](doc/tetris-terminal-ui-300.png)
+
+Simple text-based UI is included as well.
 
 
 ## Objectives
@@ -18,7 +20,16 @@ In order to start the application you'll need to have [Leiningen](http://leining
 Run the following command in console:
 
     lein run
+
   
+## Control keys
+
+- *Up* - rotate counter-clockwise
+- *Down* - rotate clockwise
+- *Left* - move left
+- *Right* - move right
+- *Enter* - speed up
+
 
 ## Things to remember
 
