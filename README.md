@@ -3,9 +3,9 @@
 
 A Clojure based engine for the game of *TETRIS*. 
 
-![Console UI for the game engine](doc/tetris-terminal-ui.png)
+![Console UI for the game engine](doc/tetris-terminal-ui-300.png)
 
-Simple text-based UI is also included.
+Simple text-based UI is included as well.
 
 
 ## Objectives
