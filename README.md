@@ -24,6 +24,7 @@ Run the following command in console:
   
 ## Control keys
 
+- *Esc* - quit game
 - *Up* - rotate counter-clockwise
 - *Down* - rotate clockwise
 - *Left* - move left
